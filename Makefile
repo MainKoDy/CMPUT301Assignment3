@@ -2,12 +2,15 @@ CC = g++
 OBJECTS = server.o
 
 #compile all object files, create executable './prodcon'.
-run: $(OBJECTS)
-	$(CC) -o server $(OBJECTS)
+run: $(OBJECTS) tands.o
+	$(CC) -o server $(OBJECTS) tands.o
 
-client: client.o
-	g++ -o client client.o
+client: client.o tands.o
+	g++ -o client client.o tands.o
 	
+tands.o: tands.o
+	g++ -c tands.cpp
+
 client.o: client.o
 	g++ -c client.cpp
 server.o: $(OBJECTS)

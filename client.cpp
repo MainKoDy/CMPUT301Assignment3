@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <chrono>
 #include "tands.h"
 
 
@@ -39,9 +40,9 @@ int main(int argc, char *argv[])
 
     int sock = 0, valread, client_fd;
     struct sockaddr_in serv_addr;
-    
-    const char* hello = "Hello from client";
     char buffer[1024] = { 0 };
+
+    
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         printf("\n Socket creation error \n");
         return -1;
@@ -63,35 +64,61 @@ int main(int argc, char *argv[])
     gethostname(buffer, 1024);
 
     printf("Host %s.%i \n", buffer, getpid());
-    send(sock, hello, strlen(hello), 0);
-    printf("Hello message sent\n");
-    valread = read(sock, buffer, 1024);
-    printf("%s\n", buffer);
+
+    int numTrans = 0;
     
     string line;
 
     while (getline(cin, line)) {
         if (line.size() == 0) { // If reached end of input, break.
+            printf("Sent %i transactions \n", numTrans);
             break;
         }
         if (line[0] == 'T') { // If given T<n>, execute a transaction with parameter n.
 
             string transTime;
-            transTime = line.substr(1, line.size());
 
-            printf("Send (T %i) \n", stoi(transTime));
+            transTime = line.substr(1, line.size());
+            const auto p1 = std::chrono::system_clock::now();
+
+            double thisTime = (chrono::duration_cast<chrono::nanoseconds>(p1.time_since_epoch()).count())/1000000; // return current execution time
+            double timeElapsed = thisTime / 1000;
+
+            sprintf(buffer, "%.2f", timeElapsed);
+            
+
+            printf("%s: Send (T %i) \n", buffer, stoi(transTime));
+
+            numTrans++;
 
             // Send the shit to server
+
+            const char* sendT = transTime.c_str();
+
+            send(sock, sendT, strlen(sendT), 0);
+            printf("Transaction sent\n");
+            valread = read(sock, buffer, 1024);
+            printf("%s\n", buffer);
 
             
         } else if (line[0] == 'S' ) { // If given S<n>, execute a transaction with parameter n.
             string sleepTime;
             sleepTime = line.substr(1, line.size());
 
-            printf("Send (S %i) \n", stoi(sleepTime));
+            printf("Sleep %i units \n", stoi(sleepTime));
+
+            Sleep(stoi(sleepTime));
+
+
+            // SLEEP
         }
 
     }
+    // send(sock, hello, strlen(hello), 0);
+    // printf("Hello message sent\n");
+    // valread = read(sock, buffer, 1024);
+    // printf("%s\n", buffer);
+
 
     close(client_fd);
 }

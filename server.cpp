@@ -10,6 +10,8 @@
 #include <sys/socket.h> 
 #include <netinet/in.h> 
 #include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros 
+#include <chrono>
+#include "tands.h"
 
 using namespace std;
 
@@ -40,9 +42,6 @@ int main(int argc, char *argv[]) {
             
         //set of socket descriptors 
         fd_set readfds;  
-            
-        //a message 
-        const char *message = "ECHO Daemon v1.0 \r\n";  
         
         //initialise all client_socket[] to 0 so not checked 
         for (i = 0; i < max_clients; i++) {  
@@ -68,7 +67,7 @@ int main(int argc, char *argv[]) {
         address.sin_addr.s_addr = INADDR_ANY;  
         address.sin_port = htons(stoi(port));  
             
-        //bind the socket to localhost port 8888 
+        //bind the socket to localhost port
         if (bind(master_socket, (struct sockaddr *)&address, sizeof(address))<0) {  
             perror("bind failed");  
             exit(EXIT_FAILURE);  
@@ -85,6 +84,7 @@ int main(int argc, char *argv[]) {
         addrlen = sizeof(address);  
         puts("Waiting for connections ..."); 
 
+        int numTrans = 0; 
         while(true) {  
             //clear the socket set 
             FD_ZERO(&readfds);  
@@ -125,13 +125,6 @@ int main(int argc, char *argv[]) {
                 
                 //inform user of socket number - used in send and receive commands 
                 printf("New connection , socket fd is %d , ip is: %s , port: %i\n", new_socket, inet_ntoa(address.sin_addr), ntohs (address.sin_port));  
-            
-                //send new connection greeting message 
-                if( send(new_socket, message, strlen(message), 0) != strlen(message) ) {  
-                    perror("send");  
-                }  
-                    
-                puts("Welcome message sent successfully");  
                     
                 //add new socket to array of sockets 
                 for (i = 0; i < max_clients; i++) {  
@@ -162,13 +155,35 @@ int main(int argc, char *argv[]) {
                         //Close the socket and mark as 0 in list for reuse 
                         close( sd );  
                         client_socket[i] = 0;  
-                    }  
+                    } 
+
                         
                     //Echo back the message that came in 
-                    else {  
+                    else { 
+                        string result = "";
+                        printf("%s\n", buffer); 
+                        numTrans++;
+                        Trans(atoi(buffer));
+
+                        const auto p1 = std::chrono::system_clock::now();
+
+                        double thisTime = (chrono::duration_cast<chrono::nanoseconds>(p1.time_since_epoch()).count())/1000000; // return current execution time
+                        double timeElapsed = thisTime / 1000;
+
+                        sprintf(buffer, "%.2f", timeElapsed);
+
+                        prtinf("%s:  #   %i (Done) from %s.%i", buffer, to_string(numTrans), );
+
+                        //send new connection greeting message 
+                        if( send(new_socket, result.c_str(), strlen(result.c_str()), 0) != strlen(result.c_str()) ) {  
+                            perror("send");  
+                        }  
+                    
+                        puts("Welcome message sent successfully");  
                         //set the string terminating NULL byte on the end 
                         //of the data read 
-                        buffer[valread] = '\0';  
+                        buffer[valread] = '\0';
+
                         send(sd , buffer , strlen(buffer) , 0 );  
                     }  
                 }  
