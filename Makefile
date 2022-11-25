@@ -19,3 +19,9 @@ server.o: $(OBJECTS)
 #delete all object files and executable.
 clean:
 	rm ./server server.o ./client client.o
+
+sclean:
+	rm ./server server.o
+
+cclean:
+	rm ./client client.o

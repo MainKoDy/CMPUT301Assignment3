@@ -18,6 +18,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+    char hostBuffer[1024], pidBuffer[1024];
     string port, ip;
     port = argv[1];
     ip = argv[2];
@@ -40,7 +41,7 @@ int main(int argc, char *argv[])
 
     int sock = 0, valread, client_fd;
     struct sockaddr_in serv_addr;
-    char buffer[1024] = { 0 };
+    char buffer[1024];
 
     
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -61,9 +62,10 @@ int main(int argc, char *argv[])
         printf("\nConnection Failed \n");
         return -1;
     }
-    gethostname(buffer, 1024);
+    gethostname(hostBuffer, 1024);
 
-    printf("Host %s.%i \n", buffer, getpid());
+    int thisPid = getpid();
+    printf("Host %s.%i \n", hostBuffer, thisPid);
 
     int numTrans = 0;
     
@@ -71,7 +73,6 @@ int main(int argc, char *argv[])
 
     while (getline(cin, line)) {
         if (line.size() == 0) { // If reached end of input, break.
-            printf("Sent %i transactions \n", numTrans);
             break;
         }
         if (line[0] == 'T') { // If given T<n>, execute a transaction with parameter n.
@@ -86,19 +87,21 @@ int main(int argc, char *argv[])
 
             sprintf(buffer, "%.2f", timeElapsed);
             
-
             printf("%s: Send (T %i) \n", buffer, stoi(transTime));
 
             numTrans++;
 
             // Send the shit to server
+        
+            string hostBufStr = hostBuffer;
+            const char *hostBuf = hostBufStr.c_str();
+            sprintf( buffer, "%i %s %i ", stoi(transTime), hostBuf, thisPid);
+            // printf("%s \n",buffer);
 
-            const char* sendT = transTime.c_str();
-
-            send(sock, sendT, strlen(sendT), 0);
-            printf("Transaction sent\n");
+            send(sock, buffer, strlen(buffer), 0);
+            // printf("Transaction sent\n");
             valread = read(sock, buffer, 1024);
-            printf("%s\n", buffer);
+            printf("%s \n", buffer);
 
             
         } else if (line[0] == 'S' ) { // If given S<n>, execute a transaction with parameter n.
@@ -108,17 +111,12 @@ int main(int argc, char *argv[])
             printf("Sleep %i units \n", stoi(sleepTime));
 
             Sleep(stoi(sleepTime));
-
-
-            // SLEEP
         }
 
     }
-    // send(sock, hello, strlen(hello), 0);
-    // printf("Hello message sent\n");
-    // valread = read(sock, buffer, 1024);
-    // printf("%s\n", buffer);
 
+
+    printf("Sent %i transactions \n", numTrans);
 
     close(client_fd);
 }
