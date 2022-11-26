@@ -3,12 +3,12 @@ CC = g++
 #Create a man page for both programs
 man: mans manc
 
-#Create a man page for server, in form of pdf.
+#Create a man page for server, in form of server.pdf.
 mans:
 	groff -Tps -man server.man > server.ps
 	ps2pdf server.ps server.pdf
 
-#Create a man page for client, in form of pdf.
+#Create a man page for client, in form of client.pdf.
 manc:
 	groff -Tps -man client.man > client.ps
 	ps2pdf client.ps client.pdf
