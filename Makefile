@@ -1,17 +1,17 @@
 CC = g++
 
-
-
 #Create a man page for both programs
 man: mans manc
 
-#Create a man page for server
+#Create a man page for server, in form of pdf.
 mans:
-	./server | groff -mandoc > manserver.pdf
+	groff -Tps -man server.man > server.ps
+	ps2pdf server.ps server.pdf
 
-#Create a man page for client
+#Create a man page for client, in form of pdf.
 manc:
-	./client | groff -mandoc > manclient.pdf
+	groff -Tps -man client.man > client.ps
+	ps2pdf client.ps client.pdf
 
 #Create both executable files.
 all: server client
@@ -60,4 +60,4 @@ server.o: server.cpp
 
 #delete all object files and executable.
 clean:
-	rm ./server server.o ./client client.o tands.o
+	rm ./server server.o ./client client.o tands.o client.ps client.pdf server.ps server.pdf

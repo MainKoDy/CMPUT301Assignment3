@@ -1,0 +1,25 @@
+.TH SERVER "November 26, 2022" "Server Version 1.0"
+.SH NAME
+\fB./client\fP \- Run a server, and start listening for clients.
+.SH SYNOPSIS
+\fB./client\fP [\fIport\fP]
+.SH DESCRIPTION
+\fB./server\fP listens at \fIport\fP for any clients.
+.SH EXAMPLES
+.TP
+\fC./server 6000
+.TP
+\fC./server 30000
+.SH FILES
+.TP
+\fC./tands.o\fR
+Object file that contains the functions for the transactions and sleeping.
+.SH SEE ALSO
+.TP
+\fC./client\fR
+.SH BUGS
+None
+.SH AUTHOR
+Kody Diep 
+ \fBCCID:\fP \fIkdiep\fR  
+ \fBStudent ID:\fP \fI1616223\fR

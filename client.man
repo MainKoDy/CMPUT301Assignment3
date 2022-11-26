@@ -1,0 +1,25 @@
+.TH CLIENT "November 26, 2022" "Client Version 1.0"
+.SH NAME
+\fB./client\fP \- Run client to pass commands to server.
+.SH SYNOPSIS
+\fB./client\fP [\fIport\fP] [\fIip-address\fP] <\fIfilename\fP
+.SH DESCRIPTION
+\fB./client\fP connects to the machine at \fIip-address\fP, using \fIport\fP, and passes commands specified at \fIfilename\fP to the server.
+.SH EXAMPLES
+.TP
+\fC./client 6000 129.128.29.41 <client.in\fR
+.TP
+\fC./client 30000 14.34.54.02 <input1.txt\fR
+.SH FILES
+.TP
+\fC./tands.o\fR
+Object file that contains the functions for the transactions and sleeping.
+.SH SEE ALSO
+.TP
+\fC./server\fR
+.SH BUGS
+None
+.SH AUTHOR
+Kody Diep 
+ \fBCCID:\fP \fIkdiep\fR  
+ \fBStudent ID:\fP \fI1616223\fR
