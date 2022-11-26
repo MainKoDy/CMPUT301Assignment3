@@ -10,14 +10,10 @@
 // TransSave is added to the wait time in Sleep -- a few billionths of a
 // second. By doing this, something "real" comes from the computation, and
 // the compiler is fooled.
-#include <iostream>
 
-using namespace std;
 int TransSave = 0;
 
-
 void Trans( int n ) {
-	std::cout << "TRANS " << n << std::endl;
 	long i, j;
 
 	// Use CPU cycles 
@@ -27,7 +23,6 @@ void Trans( int n ) {
 	}
 	TransSave += j;
 	TransSave &= 0xff;
-
 }
 
 
@@ -38,7 +33,6 @@ void Trans( int n ) {
 #include <time.h>
 
 void Sleep( int n ) {
-	std::cout << "SLEEP " << n << std::endl;
 	struct timespec sleep;
 
 	// Make sure pass a valid nanosecond time to nanosleep
@@ -52,5 +46,4 @@ void Sleep( int n ) {
 	if( nanosleep( &sleep, NULL ) < 0 ) {
 		perror ("NanoSleep" );
 	}
-
 }

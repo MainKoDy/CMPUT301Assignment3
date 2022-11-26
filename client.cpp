@@ -12,23 +12,27 @@
 #include <chrono>
 #include "tands.h"
 
-
-
+// Citation: "client.c" in https://www.geeksforgeeks.org/socket-programming-cc/
 using namespace std;
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+
+    // Initialize variables.
     char hostBuffer[1024], pidBuffer[1024];
     string port, ip;
     port = argv[1];
     ip = argv[2];
     const char* thisIp = ip.c_str();
+
+    // Check that given port is a non-negative integer.
     for(char c : port) {
         if (!isdigit(c) || &c == "-") {
-            printf("Given port number is not a proper int. Exiting ...\n");
+            printf("Given port number is not a proper int, or is negative. Exiting ...\n");
             return 0;
         }
     }
+
+    // Check that the port is in the range 5,000 and 64,000.
     if (((stoi(port)-64000) * (stoi(port)-5000)) > 0) {
         printf("Port not in range 5000 to 64000. Exiting ...\n");
         return 0;
@@ -37,8 +41,7 @@ int main(int argc, char *argv[])
     printf("Using port %i \n", stoi(port));
     printf("Using server address %s \n", thisIp);
 
-    // Check if ip address is the machine that opened the server
-
+    // Initialize socket variables.
     int sock = 0, valread, client_fd;
     struct sockaddr_in serv_addr;
     char buffer[1024];
@@ -50,32 +53,36 @@ int main(int argc, char *argv[])
     }
  
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(stoi(port));
+    serv_addr.sin_port = htons(stoi(port)); // Set socket port to the port given. 
  
-    // Convert IPv4 and IPv6 addresses from text to binary form
+    // Convert the IPv4 ddresses from text to binary form
     if (inet_pton(AF_INET, thisIp, &serv_addr.sin_addr) <= 0) {
         printf("\nInvalid address/ Address not supported \n");
         return -1;
     }
 
+    // Try to connect to the given address at the given port.
     if ((client_fd = connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr))) < 0) {
         printf("\nConnection Failed \n");
         return -1;
     }
+
+    // Get the host name of the client, store in hostBuffer.
     gethostname(hostBuffer, 1024);
 
     int thisPid = getpid();
-    printf("Host %s.%i \n", hostBuffer, thisPid);
+    printf("Host %s.%i \n", hostBuffer, thisPid); // Print the host and the pid of the transaction.
 
     int numTrans = 0;
-    
+
     string line;
 
+    // Get input from user.
     while (getline(cin, line)) {
         if (line.size() == 0) { // If reached end of input, break.
             break;
         }
-        if (line[0] == 'T') { // If given T<n>, execute a transaction with parameter n.
+        if (line[0] == 'T') { // If given T<n>, send the parameter given to the server.
 
             string transTime;
 
@@ -87,26 +94,20 @@ int main(int argc, char *argv[])
 
             sprintf(buffer, "%.2f", timeElapsed);
             
-            printf("%s: Send (T %i) \n", buffer, stoi(transTime));
+            printf("%s: Send (T %i) \n", buffer, stoi(transTime)); 
 
             numTrans++;
-
-            // Send the shit to server
         
             string hostBufStr = hostBuffer;
             const char *hostBuf = hostBufStr.c_str();
             sprintf( buffer, "%i %s %i ", stoi(transTime), hostBuf, thisPid);
-            // printf("%s \n",buffer);
 
-            send(sock, buffer, strlen(buffer), 0);
-            // printf("Transaction sent\n");
+            send(sock, buffer, strlen(buffer), 0); // Create the data to be sent to the server.
             char recBuffer[1024];
-            valread = read(sock, recBuffer, 1024);
-            string bruh = buffer;
-            cout << bruh << endl;
-
+            valread = read(sock, recBuffer, 1024); // Receive data from the server, and print.
+            printf("%s \n", recBuffer);
             
-        } else if (line[0] == 'S' ) { // If given S<n>, execute a transaction with parameter n.
+        } else if (line[0] == 'S' ) { // If given S<n>, sleep for n amount.
             string sleepTime;
             sleepTime = line.substr(1, line.size());
 
@@ -117,10 +118,10 @@ int main(int argc, char *argv[])
 
     }
 
-    sprintf( buffer, "E ");
+    sprintf( buffer, "E "); // If the program reaches the end of input, send "E" to the server to indicate that it is done.
     send(sock, buffer, strlen(buffer), 0);
 
-    printf("Sent %i transactions \n", numTrans);
+    printf("Sent %i transaction(s) \n", numTrans);
 
-    close(client_fd);
+    close(client_fd); // Close the socket connection.
 }
