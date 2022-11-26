@@ -105,7 +105,8 @@ int main(int argc, char *argv[]) {
             send(sock, buffer, strlen(buffer), 0); // Create the data to be sent to the server.
             char recBuffer[1024];
             valread = read(sock, recBuffer, 1024); // Receive data from the server, and print.
-            printf("%s \n", recBuffer);
+            string recString = recBuffer;
+            cout << recString << endl;
             
         } else if (line[0] == 'S' ) { // If given S<n>, sleep for n amount.
             string sleepTime;
