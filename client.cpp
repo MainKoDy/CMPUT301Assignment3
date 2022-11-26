@@ -100,8 +100,10 @@ int main(int argc, char *argv[])
 
             send(sock, buffer, strlen(buffer), 0);
             // printf("Transaction sent\n");
-            valread = read(sock, buffer, 1024);
-            printf("%s \n", buffer);
+            char recBuffer[1024];
+            valread = read(sock, recBuffer, 1024);
+            string bruh = buffer;
+            cout << bruh << endl;
 
             
         } else if (line[0] == 'S' ) { // If given S<n>, execute a transaction with parameter n.
@@ -115,6 +117,8 @@ int main(int argc, char *argv[])
 
     }
 
+    sprintf( buffer, "E ");
+    send(sock, buffer, strlen(buffer), 0);
 
     printf("Sent %i transactions \n", numTrans);
 
